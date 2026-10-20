@@ -11,6 +11,7 @@ const ctx = canvas.getContext("2d");
 
 const WIDTH = canvas.width;   // 600
 const HEIGHT = canvas.height; // 450
+const GameState = { score: 0, lives: 3 };
 
 
 // ------------------------------------------------------------
@@ -26,16 +27,16 @@ const ball = {
   y: 0,
   width: 12,
   height: 12,
-  vx: 0,
-  vy: 0
+  velocity: { ...VelocityComponent },
+  beeper: new Beeper(440)
 };
 
 // Put the ball in the center and reset its speed and direction.
 function resetBall() {
   ball.x = WIDTH / 2 - ball.width / 2;
   ball.y = HEIGHT / 2 - ball.height / 2;
-  ball.vx = BALL_SPEED;  // right
-  ball.vy = BALL_SPEED;  // down
+  ball.velocity.vx = BALL_SPEED;  // right
+  ball.velocity.vy = BALL_SPEED;  // down
 }
 
 
@@ -64,6 +65,7 @@ let bricks = [];
 const keys = {};
 
 document.addEventListener("keydown", function (event) {
+  unlockBeeperAudio();
   keys[event.key.toLowerCase()] = true;
   // Stop the arrow keys from scrolling the page.
   if (event.key.startsWith("Arrow")) {
@@ -90,6 +92,7 @@ function update() {
 
   // The ball fell off the bottom: back to the center.
   if (ball.y > HEIGHT) {
+    GameState.lives -= 1;
     resetBall();
   }
 }
@@ -112,8 +115,12 @@ function movePaddle() {
 }
 
 function moveBall() {
-  ball.x = ball.x + ball.vx;
-  ball.y = ball.y + ball.vy;
+  moveBallSystem(ball);
+}
+
+function moveBallSystem(entity) {
+  entity.x = entity.x + entity.velocity.vx;
+  entity.y = entity.y + entity.velocity.vy;
 }
 
 
@@ -124,6 +131,11 @@ function moveBall() {
 function draw() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  ctx.fillStyle = "white";
+  ctx.font = "bold 20px Courier New, monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(`GameState  |  Score: ${GameState.score}  |  Lives: ${GameState.lives}`, WIDTH / 2, 28);
 
   ctx.fillStyle = "white";
   ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);

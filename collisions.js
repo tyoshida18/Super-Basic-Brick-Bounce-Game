@@ -22,26 +22,27 @@ function boxesTouch(a, b) {
 function bounceOffWalls() {
   if (ball.x < 0) {
     ball.x = 0;
-    ball.vx = -ball.vx;
+    ball.velocity.vx = -ball.velocity.vx;
   }
   if (ball.x + ball.width > WIDTH) {
     ball.x = WIDTH - ball.width;
-    ball.vx = -ball.vx;
+    ball.velocity.vx = -ball.velocity.vx;
   }
   if (ball.y < 0) {
     ball.y = 0;
-    ball.vy = -ball.vy;
+    ball.velocity.vy = -ball.velocity.vy;
   }
 }
 
 
 // The ball bounces off the top of the paddle.
-// ball.vy > 0 means "the ball is moving down", so it only bounces
+// ball.velocity.vy > 0 means "the ball is moving down", so it only bounces
 // when it is falling onto the paddle.
 function bounceOffPaddle() {
-  if (boxesTouch(ball, paddle) && ball.vy > 0) {
+  if (boxesTouch(ball, paddle) && ball.velocity.vy > 0) {
+    playBeeper(ball);
     ball.y = paddle.y - ball.height;  // sit on top of the paddle
-    ball.vy = -ball.vy;
+    ball.velocity.vy = -ball.velocity.vy;
   }
 }
 
@@ -54,13 +55,15 @@ function bounceOffBricks() {
       continue;  // not touching this brick, check the next one
     }
 
+    playBeeper(ball);
+
     // How far has the ball pushed into the brick on each side?
     const overlapX = Math.min(ball.x + ball.width, brick.x + brick.width) - Math.max(ball.x, brick.x);
     const overlapY = Math.min(ball.y + ball.height, brick.y + brick.height) - Math.max(ball.y, brick.y);
 
     if (overlapX < overlapY) {
       // The ball hit the brick's left or right side.
-      ball.vx = -ball.vx;
+      ball.velocity.vx = -ball.velocity.vx;
       if (ball.x < brick.x) {
         ball.x = brick.x - ball.width;     // left of the brick
       } else {
@@ -68,7 +71,7 @@ function bounceOffBricks() {
       }
     } else {
       // The ball hit the brick's top or bottom.
-      ball.vy = -ball.vy;
+      ball.velocity.vy = -ball.velocity.vy;
       if (ball.y < brick.y) {
         ball.y = brick.y - ball.height;    // above the brick
       } else {
@@ -77,6 +80,7 @@ function bounceOffBricks() {
     }
 
     bricks.splice(index, 1);
+    GameState.score += 10;
     break;  // bounce off one brick per update, then stop looking
   }
 }
