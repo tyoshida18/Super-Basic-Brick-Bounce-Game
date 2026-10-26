@@ -11,7 +11,7 @@ const ctx = canvas.getContext("2d");
 
 const WIDTH = canvas.width;   // 600
 const HEIGHT = canvas.height; // 450
-const GameState = { score: 0, lives: 3 };
+const GameState = { score: 0, lives: 3, level: 1 };
 let isPaused = false;
 
 function pauseGame() {
@@ -26,6 +26,9 @@ function pauseGame() {
 // A positive vy means the ball is moving DOWN the screen.
 // ------------------------------------------------------------
 const BALL_SPEED = 4;
+const MAX_BALL_SPEED = 8;
+const PADDLE_WIDTH = 90;
+const MIN_PADDLE_WIDTH = 50;
 
 const ball = {
   x: 0,
@@ -40,8 +43,9 @@ const ball = {
 function resetBall() {
   ball.x = WIDTH / 2 - ball.width / 2;
   ball.y = HEIGHT / 2 - ball.height / 2;
-  ball.velocity.vx = BALL_SPEED;  // right
-  ball.velocity.vy = BALL_SPEED;  // down
+  const speed = Math.min(BALL_SPEED + (GameState.level - 1) * 0.5, MAX_BALL_SPEED);
+  ball.velocity.vx = speed;  // right
+  ball.velocity.vy = speed;  // down
 }
 
 
@@ -51,7 +55,7 @@ function resetBall() {
 const paddle = {
   x: WIDTH / 2 - 45,
   y: HEIGHT - 30,
-  width: 90,
+  width: PADDLE_WIDTH,
   height: 12,
   speed: 6
 };
@@ -69,10 +73,22 @@ let bricks = [];
 // ------------------------------------------------------------
 const keys = {};
 
+function levelUp() {
+  GameState.level += 1;
+
+  const speed = Math.min(BALL_SPEED + (GameState.level - 1) * 0.5, MAX_BALL_SPEED);
+  ball.velocity.vx = Math.sign(ball.velocity.vx) * speed;
+  ball.velocity.vy = Math.sign(ball.velocity.vy) * speed;
+  paddle.width = Math.max(PADDLE_WIDTH - (GameState.level - 1) * 5, MIN_PADDLE_WIDTH);
+  paddle.x = Math.min(paddle.x, WIDTH - paddle.width);
+}
+
 function restartGame() {
   GameState.score = 0;
   GameState.lives = 3;
+  GameState.level = 1;
   isPaused = false;
+  paddle.width = PADDLE_WIDTH;
   paddle.x = WIDTH / 2 - paddle.width / 2;
   bricks = makeBricks();
   resetBall();
@@ -91,6 +107,9 @@ document.addEventListener("keydown", function (event) {
   }
   if (event.key.toLowerCase() === "r" && !event.repeat) {
     restartGame();
+  }
+  if (event.key.toLowerCase() === "l" && !event.repeat) {
+    levelUp();
   }
   // Stop the arrow keys from scrolling the page.
   if (event.key.startsWith("Arrow")) {
@@ -162,7 +181,7 @@ function draw() {
   ctx.fillStyle = "white";
   ctx.font = "bold 20px Courier New, monospace";
   ctx.textAlign = "center";
-  ctx.fillText(`GameState  |  Score: ${GameState.score}  |  Lives: ${GameState.lives}`, WIDTH / 2, 28);
+  ctx.fillText(`Level: ${GameState.level}  |  Score: ${GameState.score}  |  Lives: ${GameState.lives}`, WIDTH / 2, 28);
 
   ctx.fillStyle = "white";
   ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
