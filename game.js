@@ -8,6 +8,7 @@
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+const pauseButton = document.getElementById("pause-button");
 
 const WIDTH = canvas.width;   // 600
 const HEIGHT = canvas.height; // 450
@@ -16,6 +17,11 @@ let isPaused = false;
 
 function pauseGame() {
   isPaused = !isPaused;
+  updatePauseButton();
+}
+
+function updatePauseButton() {
+  pauseButton.textContent = isPaused ? "Resume" : "Pause";
 }
 
 
@@ -88,6 +94,7 @@ function restartGame() {
   GameState.lives = 3;
   GameState.level = 1;
   isPaused = false;
+  updatePauseButton();
   paddle.width = PADDLE_WIDTH;
   paddle.x = WIDTH / 2 - paddle.width / 2;
   bricks = makeBricks();
@@ -98,6 +105,8 @@ function restartGame() {
   leftover = 0;
   lastTime = performance.now();
 }
+
+pauseButton.addEventListener("click", pauseGame);
 
 document.addEventListener("keydown", function (event) {
   unlockBeeperAudio();
