@@ -12,6 +12,11 @@ const ctx = canvas.getContext("2d");
 const WIDTH = canvas.width;   // 600
 const HEIGHT = canvas.height; // 450
 const GameState = { score: 0, lives: 3 };
+let isPaused = false;
+
+function pauseGame() {
+  isPaused = !isPaused;
+}
 
 
 // ------------------------------------------------------------
@@ -67,6 +72,9 @@ const keys = {};
 document.addEventListener("keydown", function (event) {
   unlockBeeperAudio();
   keys[event.key.toLowerCase()] = true;
+  if (event.key.toLowerCase() === "p" && !event.repeat) {
+    pauseGame();
+  }
   // Stop the arrow keys from scrolling the page.
   if (event.key.startsWith("Arrow")) {
     event.preventDefault();
@@ -144,6 +152,11 @@ function draw() {
   ctx.fillRect(ball.x, ball.y, ball.width, ball.height);
 
   drawBricks();  // bricks.js
+
+  if (isPaused) {
+    ctx.font = "bold 32px Courier New, monospace";
+    ctx.fillText("PAUSED", WIDTH / 2, HEIGHT / 2);
+  }
 }
 
 
@@ -166,9 +179,13 @@ function frame(now) {
     leftover = 250;
   }
 
-  while (leftover >= STEP) {
-    update();
-    leftover = leftover - STEP;
+  if (isPaused) {
+    leftover = 0;
+  } else {
+    while (leftover >= STEP) {
+      update();
+      leftover = leftover - STEP;
+    }
   }
 
   draw();
