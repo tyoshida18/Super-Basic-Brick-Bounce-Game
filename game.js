@@ -69,11 +69,28 @@ let bricks = [];
 // ------------------------------------------------------------
 const keys = {};
 
+function restartGame() {
+  GameState.score = 0;
+  GameState.lives = 3;
+  isPaused = false;
+  paddle.x = WIDTH / 2 - paddle.width / 2;
+  bricks = makeBricks();
+  resetBall();
+  Object.keys(keys).forEach(function (key) {
+    keys[key] = false;
+  });
+  leftover = 0;
+  lastTime = performance.now();
+}
+
 document.addEventListener("keydown", function (event) {
   unlockBeeperAudio();
   keys[event.key.toLowerCase()] = true;
   if (event.key.toLowerCase() === "p" && !event.repeat) {
     pauseGame();
+  }
+  if (event.key.toLowerCase() === "r" && !event.repeat) {
+    restartGame();
   }
   // Stop the arrow keys from scrolling the page.
   if (event.key.startsWith("Arrow")) {
