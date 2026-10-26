@@ -13,6 +13,8 @@ const pauseButton = document.getElementById("pause-button");
 const WIDTH = canvas.width;   // 600
 const HEIGHT = canvas.height; // 450
 const GameState = { score: 0, lives: 3, level: 1 };
+let gameTimer = 0;
+let gameTicks = 0;
 let isPaused = false;
 
 function pauseGame() {
@@ -32,9 +34,9 @@ function updatePauseButton() {
 // A positive vy means the ball is moving DOWN the screen.
 // ------------------------------------------------------------
 const BALL_SPEED = 4;
-const MAX_BALL_SPEED = 8;
 const PADDLE_WIDTH = 90;
-const MIN_PADDLE_WIDTH = 50;
+const MIN_PADDLE_WIDTH = 30;
+let currentBallSpeed = BALL_SPEED;
 
 const ball = {
   x: 0,
@@ -49,9 +51,8 @@ const ball = {
 function resetBall() {
   ball.x = WIDTH / 2 - ball.width / 2;
   ball.y = HEIGHT / 2 - ball.height / 2;
-  const speed = Math.min(BALL_SPEED + (GameState.level - 1) * 0.5, MAX_BALL_SPEED);
-  ball.velocity.vx = speed;  // right
-  ball.velocity.vy = speed;  // down
+  ball.velocity.vx = currentBallSpeed;  // right
+  ball.velocity.vy = currentBallSpeed;  // down
 }
 
 
@@ -82,10 +83,12 @@ const keys = {};
 function levelUp() {
   GameState.level += 1;
 
-  const speed = Math.min(BALL_SPEED + (GameState.level - 1) * 0.5, MAX_BALL_SPEED);
-  ball.velocity.vx = Math.sign(ball.velocity.vx) * speed;
-  ball.velocity.vy = Math.sign(ball.velocity.vy) * speed;
-  paddle.width = Math.max(PADDLE_WIDTH - (GameState.level - 1) * 5, MIN_PADDLE_WIDTH);
+  currentBallSpeed *= 1.2;
+  ball.velocity.vx = Math.sign(ball.velocity.vx) * currentBallSpeed;
+  ball.velocity.vy = Math.sign(ball.velocity.vy) * currentBallSpeed;
+  if (GameState.level <= 10) {
+    paddle.width = Math.max(paddle.width - 15, MIN_PADDLE_WIDTH);
+  }
   paddle.x = Math.min(paddle.x, WIDTH - paddle.width);
 }
 
@@ -93,6 +96,9 @@ function restartGame() {
   GameState.score = 0;
   GameState.lives = 3;
   GameState.level = 1;
+  gameTimer = 0;
+  gameTicks = 0;
+  currentBallSpeed = BALL_SPEED;
   isPaused = false;
   updatePauseButton();
   paddle.width = PADDLE_WIDTH;
@@ -147,7 +153,20 @@ function update() {
   // The ball fell off the bottom: back to the center.
   if (ball.y > HEIGHT) {
     GameState.lives -= 1;
+    if (GameState.lives <= 0) {
+      restartGame();
+      return;
+    }
     resetBall();
+  }
+
+  gameTicks += 1;
+  gameTimer = gameTicks / 60;
+  if (gameTicks % (20 * 60) === 0 && GameState.lives >= 1) {
+    levelUp();
+  }
+  if (gameTicks === 30 * 60 && GameState.lives === 3) {
+    levelUp();
   }
 }
 function movePaddleLeft() {
@@ -228,8 +247,8 @@ function frame(now) {
     leftover = 0;
   } else {
     while (leftover >= STEP) {
-      update();
       leftover = leftover - STEP;
+      update();
     }
   }
 
