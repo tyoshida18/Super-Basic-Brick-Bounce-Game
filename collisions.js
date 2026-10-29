@@ -79,6 +79,10 @@ function bounceOffBricks() {
       }
     }
 
+    if (brick.type === "speed") {
+      applySpeedBoost();
+    }
+
     bricks.splice(index, 1);
     GameState.score += 10;
     break;  // bounce off one brick per update, then stop looking

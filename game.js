@@ -92,6 +92,13 @@ function levelUp() {
   paddle.x = Math.min(paddle.x, WIDTH - paddle.width);
 }
 
+// Speed bricks raise the ball's speed without changing its direction.
+function applySpeedBoost() {
+  currentBallSpeed *= 1.2;
+  ball.velocity.vx = Math.sign(ball.velocity.vx) * currentBallSpeed;
+  ball.velocity.vy = Math.sign(ball.velocity.vy) * currentBallSpeed;
+}
+
 function restartGame() {
   GameState.score = 0;
   GameState.lives = 3;
