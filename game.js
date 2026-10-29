@@ -35,6 +35,7 @@ function updatePauseButton() {
 // ------------------------------------------------------------
 const BALL_SPEED = 4;
 const PADDLE_WIDTH = 90;
+const STARTING_PADDLE_WIDTH = PADDLE_WIDTH * 1.5;
 const MIN_PADDLE_WIDTH = 30;
 let currentBallSpeed = BALL_SPEED;
 
@@ -60,9 +61,9 @@ function resetBall() {
 // THE PADDLE
 // ------------------------------------------------------------
 const paddle = {
-  x: WIDTH / 2 - 45,
+  x: WIDTH / 2 - STARTING_PADDLE_WIDTH / 2,
   y: HEIGHT - 30,
-  width: PADDLE_WIDTH,
+  width: STARTING_PADDLE_WIDTH,
   height: 12,
   speed: 6
 };
@@ -108,7 +109,7 @@ function restartGame() {
   currentBallSpeed = BALL_SPEED;
   isPaused = false;
   updatePauseButton();
-  paddle.width = PADDLE_WIDTH;
+  paddle.width = STARTING_PADDLE_WIDTH;
   paddle.x = WIDTH / 2 - paddle.width / 2;
   bricks = makeBricks();
   resetBall();
@@ -223,6 +224,10 @@ function draw() {
   ctx.fillRect(ball.x, ball.y, ball.width, ball.height);
 
   drawBricks();  // bricks.js
+
+  ctx.fillStyle = "white";
+  ctx.font = "14px Courier New, monospace";
+  ctx.fillText("Hit the blue brick and there will be a surprise!", WIDTH / 2, HEIGHT - 8);
 
   if (isPaused) {
     ctx.font = "bold 32px Courier New, monospace";

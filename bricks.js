@@ -34,8 +34,8 @@ function makeBricks() {
 
   for (let row = 0; row < BRICK_ROWS; row++) {
     for (let col = 0; col < BRICK_COLUMNS; col++) {
-      // The first row is one full row of Speed bricks; all other rows are normal.
-      const type = row === 0 ? "speed" : "normal";
+      // Select only the top-left brick as the single Speed brick.
+      const type = row === 0 && col === 0 ? "speed" : "normal";
       list.push(BrickFactory.create(
         type,
         left + col * (BRICK_WIDTH + BRICK_GAP),
