@@ -9,15 +9,27 @@ const BRICK_HEIGHT = 20;
 const BRICK_GAP = 6;     // empty space between bricks
 const BRICKS_TOP = 50;   // how far down the first row starts
 
+function stayStill(brick) {}
+
+function slide(brick) {
+  brick.x += brick.speed;
+  if (Math.abs(brick.x - brick.startX) > 30) {
+    brick.speed = -brick.speed;
+  }
+}
+
 // Creates bricks with the color and type needed by drawing and collisions.
 const BrickFactory = {
-  create(type, x, y, width, height) {
+  create(type, x, y, width, height, row) {
     return {
       x,
       y,
       width,
       height,
       type,
+      move: row === 0 ? slide : stayStill,
+      speed: row === 0 ? 1 : 0,
+      startX: x,
       color: type === "speed" ? "darkblue" : "white"
     };
   }
@@ -41,7 +53,8 @@ function makeBricks() {
         left + col * (BRICK_WIDTH + BRICK_GAP),
         BRICKS_TOP + row * (BRICK_HEIGHT + BRICK_GAP),
         BRICK_WIDTH,
-        BRICK_HEIGHT
+        BRICK_HEIGHT,
+        row
       ));
     }
   }

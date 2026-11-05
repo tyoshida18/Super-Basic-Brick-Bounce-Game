@@ -150,7 +150,10 @@ document.addEventListener("keyup", function (event) {
 // what they touched.
 // ------------------------------------------------------------
 function update() {
-  
+  for (const brick of bricks) {
+    brick.move(brick);
+  }
+
   movePaddle();
   moveBall();
 
